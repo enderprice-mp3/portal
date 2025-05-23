@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Yakei Records Artist Portal</title>
+<style>
+  /* Dark mode base */
+  :root {
+    --bg-color: #121212;
+    --text-color: #eee;
+    --accent-color: #1DB954;
+    --link-color: #1DB954;
+    --link-hover: #17a44a;
+    --card-bg: #1e1e1e;
+    --border-color: #333;
+  }
+
+  body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 20px;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+  }
+
+  #app {
+    max-width: 700px;
+    width: 100%;
+  }
+
+  h1 {
+    color: var(--accent-color);
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+
+  h2 {
+    color: var(--accent-color);
+    margin-top: 0;
+  }
+
+  a {
+    color: var(--link-color);
+    text-decoration: none;
+  }
+
+  a:hover {
+    color: var(--link-hover);
+    text-decoration: underline;
+  }
+
+  .artist-list a {
+    display: block;
+    margin: 12px 0;
+    font-size: 1.1rem;
+    padding: 8px 12px;
+    background-color: var(--card-bg);
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    transition: background-color 0.3s ease;
+  }
+
+  .artist-list a:hover {
+    background-color: var(--accent-color);
+    color: #121212;
+  }
+
+  .dashboard {
+    background-color: var(--card-bg);
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+  }
+
+  ul {
+    list-style: none;
+    padding-left: 0;
+  }
+
+  li {
+    margin: 10px 0;
+    font-size: 1.05rem;
+  }
+
+  strong {
+    color: var(--accent-color);
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-top: 20px;
+    font-weight: 600;
+  }
+
+  /* Responsive */
+  @media (max-width: 480px) {
+    body {
+      padding: 10px;
+    }
+
+    .dashboard {
+      padding: 15px;
+    }
+
+    .artist-list a {
+      font-size: 1rem;
+      padding: 6px 10px;
+    }
+  }
+</style>
+</head>
+<body>
+  <div id="app">
+    <h1>Yakei Records Artist Portal</h1>
+    <div id="content">Loading...</div>
+  </div>
+
+  <script>
+    // Manually update this data whenever you want
+    const data = {
+      "artists": [
+        {
+          "name": "Enderprice",
+          "videosPosted": 12,
+          "tracksReleased": 22,
+          "upcomingReleases": ["Shadow Drift", "Nightfall Vibes"],
+          "featuredPlaylists": ["Darkwave Essentials", "Yakei Spotlight"]
+        },
+        {
+          "name": "Echo Pulse",
+          "videosPosted": 8,
+          "tracksReleased": 14,
+          "upcomingReleases": [],
+          "featuredPlaylists": ["Synthwave Favorites"]
+        },
+        {
+          "name": "Nova Raze",
+          "videosPosted": 5,
+          "tracksReleased": 9,
+          "upcomingReleases": ["Solar Flare"],
+          "featuredPlaylists": []
+        }
+      ]
+    };
+
+    // Get artist from URL query ?artist=Name
+    function getArtistNameFromQuery() {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('artist');
+    }
+
+    // Render list of artists with clickable links
+    function renderArtistList(artists) {
+      const container = document.getElementById('content');
+      container.innerHTML = `
+        <h2>Select an Artist</h2>
+        <div class="artist-list">
+          ${artists.map(a => `<a href="?artist=${encodeURIComponent(a.name)}">${a.name}</a>`).join('')}
+        </div>
+      `;
+    }
+
+    // Render detailed dashboard for a specific artist
+    function renderDashboard(artist) {
+      const container = document.getElementById('content');
+      container.innerHTML = `
+        <div class="dashboard">
+          <h2>${artist.name} Dashboard</h2>
+          <ul>
+            <li><strong>Videos Posted:</strong> ${artist.videosPosted}</li>
+            <li><strong>Tracks Released:</strong> ${artist.tracksReleased}</li>
+            <li><strong>Upcoming Releases:</strong> ${artist.upcomingReleases.length > 0 ? artist.upcomingReleases.join(', ') : 'None'}</li>
+            <li><strong>Featured Playlists:</strong> ${artist.featuredPlaylists.length > 0 ? artist.featuredPlaylists.join(', ') : 'None'}</li>
+          </ul>
+          <a href="/" class="back-link">&larr; Back to Artist List</a>
+        </div>
+      `;
+    }
+
+    // Init app: load correct view based on URL param
+    (function init() {
+      const artistName = getArtistNameFromQuery();
+
+      if (!artistName) {
+        // Show artist list if no artist specified
+        renderArtistList(data.artists);
+        return;
+      }
+
+      // Find artist ignoring case
+      const artist = data.artists.find(a => a.name.toLowerCase() === artistName.toLowerCase());
+
+      if (artist) {
+        renderDashboard(artist);
+      } else {
+        document.getElementById('content').innerHTML = `
+          <p>Artist not found. <a href="/" class="back-link">Back to artist list</a></p>
+        `;
+      }
+    })();
+  </script>
+</body>
+</html>
